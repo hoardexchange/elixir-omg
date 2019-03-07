@@ -12,25 +12,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-defmodule OMG.Eth.Geth do
+defmodule OMG.Eth.Node do
   @moduledoc """
-  Tracks state of local geth
+  Tracks state of local node (Geth only is supported)
   """
 
-  @spec node_ready() :: :ok | {:error, :geth_still_syncing | :geth_not_listening}
+  @spec node_ready() :: :ok | {:error, :node_still_syncing | :node_not_listening}
   def node_ready do
     case Ethereumex.HttpClient.eth_syncing() do
       {:ok, false} -> :ok
-      {:ok, _} -> {:error, :geth_still_syncing}
-      {:error, :econnrefused} -> {:error, :geth_not_listening}
+      {:ok, _} -> {:error, :node_still_syncing}
+      {:error, :econnrefused} -> {:error, :node_not_listening}
     end
   end
 
   @doc """
-  Checks geth syncing status, errors are treated as not synced.
+  Checks node syncing status, errors are treated as not synced.
   Returns:
-  * false - geth is synced
-  * true  - geth is still syncing.
+  * false - node is synced
+  * true  - node is still syncing.
   """
   @spec syncing?() :: boolean
   def syncing?, do: node_ready() != :ok
