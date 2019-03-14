@@ -47,7 +47,7 @@ defmodule OMG.Eth do
         with {:ok, passphrase} <- get_signer_passphrase(txmap.from) do
           opts = Keyword.merge([passphrase: passphrase], opts)
           params = [txmap, Keyword.get(opts, :passphrase, "")]
-          {:ok, receipt_enc} = Ethereumex.HttpClient.request("personal_sendTransaction", params, [])
+          {:ok, receipt_enc} = Ethereumex.HttpClient.request("personal_sendTransaction", params, opts)
           {:ok, from_hex(receipt_enc)}
         end
     end
@@ -92,7 +92,8 @@ defmodule OMG.Eth do
   end
 
   @spec contract_transact(address, address, binary, [any], keyword) :: {:ok, binary} | {:error, any}
-  def contract_transact(from, to, signature, args, opts \\ []) do
+  def contract_transact(from, to, signature, args, opts_full \\ []) do
+    opts = Keyword.delete(opts_full, :debug)
     data = encode_tx_data(signature, args)
 
     txmap =
@@ -100,7 +101,8 @@ defmodule OMG.Eth do
       |> Map.merge(Map.new(opts))
       |> encode_all_integer_opts()
 
-    {:ok, _txhash} = send_transaction(txmap)
+    IO.puts("Eth.contract_transact")
+    {:ok, _txhash} = send_transaction(txmap, opts_full)
   end
 
   defp encode_all_integer_opts(opts) do

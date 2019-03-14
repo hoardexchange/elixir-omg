@@ -39,6 +39,7 @@ defmodule OMG.Watcher.Integration.StandardExitTest do
   @timeout 40_000
   @eth OMG.Eth.RootChain.eth_pseudo_address()
 
+  @tag :dud
   @tag fixtures: [:watcher_sandbox, :stable_alice, :child_chain, :token, :stable_alice_deposits]
   test "exit finalizes", %{
     stable_alice: alice,
@@ -65,7 +66,16 @@ defmodule OMG.Watcher.Integration.StandardExitTest do
       "utxo_pos" => utxo_pos
     } = TestHelper.get_exit_data(tx_blknum, 0, 0)
 
-    {:ok, %{"status" => "0x1"}} =
+    {:ok, block_hash} = Eth.RootChain.get_child_chain(1000)
+    IO.puts("block hash is #{inspect block_hash}")
+
+    {utxo_pos,
+      txbytes,
+      proof,
+      alice.addr}
+    |> IO.inspect(label: :exit_data, limit: :infinity)
+
+    {:ok, %{"status" => "0x1"}} = result =
       Eth.RootChain.start_exit(
         utxo_pos,
         txbytes,
@@ -73,6 +83,7 @@ defmodule OMG.Watcher.Integration.StandardExitTest do
         alice.addr
       )
       |> Eth.DevHelpers.transact_sync!()
+    IO.puts("startStandardExit receipt: #{inspect result, limit: :infinity}")
 
     exit_period = Application.fetch_env!(:omg_eth, :exit_period_seconds) * 1_000
     Process.sleep(2 * exit_period + 5_000)

@@ -54,6 +54,17 @@ defmodule OMG.EthTest do
     assert {:ok, false} = Eth.RootChain.has_token(<<1::160>>, contract.contract_addr)
   end
 
+  @tag :dud2
+  @tag fixtures: [:contract, :alice]
+  test "payable transactions are properly encoded", %{contract: contract, alice: alice} do
+    value = 100
+    {:ok, %{"status" => "0x1"}} =
+      Transaction.new([], [{alice.addr, @eth, value}])
+      |> Transaction.encode()
+      |> Eth.RootChain.deposit(value, alice.addr)
+      |> Eth.DevHelpers.transact_sync!()
+  end
+
   @tag fixtures: [:contract]
   test "binary/integer arugments tx and integer argument call returning a binary/integer tuple", %{contract: contract} do
     assert {:ok, _} =

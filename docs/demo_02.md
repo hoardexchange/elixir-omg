@@ -104,7 +104,7 @@ Poison.decode!()
     composed_exit["utxo_pos"],
     composed_exit["txbytes"] |> Encoding.from_hex(),
     composed_exit["proof"] |> Encoding.from_hex(),
-    bob.addr
+    alice.addr
   )
 Eth.WaitFor.eth_receipt(txhash)
 

@@ -76,12 +76,13 @@ defmodule OMG.Eth.RootChain do
 
     contract = contract || from_hex(Application.fetch_env!(:omg_eth, :contract_addr))
 
+    IO.puts("root_chain:start_exit")
     Eth.contract_transact(
       from,
       contract,
       "startStandardExit(uint192,bytes,bytes)",
       [utxo_pos, tx_bytes, proof],
-      opts
+      [{:debug, true} | opts]
     )
   end
 
